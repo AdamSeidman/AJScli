@@ -20,4 +20,11 @@
 // #define _CLI_RTOS_TASK_DELETE    0
 // #define CLI_ESC_HAS_PREFIX       0
 
+// Define if initialization functions are necessary
+// #define CLI_INIT(get, put)              \
+//     do {                                \
+//         (void) get;                     \
+//         (void) put;                     \
+//     } while (0)
+
 #endif /* AJS_CLI_CFG_H__ */

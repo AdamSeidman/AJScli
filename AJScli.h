@@ -16,6 +16,8 @@
 #ifndef AJS_CLI_H__
 #define AJS_CLI_H__
 
+#include "AJScliCfg.h"
+
 /* ===== Override Macros ===== */
 #ifndef _CLI_SET_OPS
     #ifdef _WIN32
@@ -90,6 +92,10 @@ typedef long CliType_t;
 #define CLI_HAS_INSERT_MODE         (1)
 #endif
 
+#ifndef CLI_INIT
+#define CLI_INIT(get, put)
+#endif
+
 /* ===== CLI Constants ===== */
 #define CLI_CHAR_PRINT_MIN          (0x20)
 #define CLI_CHAR_PRINT_MAX          (0x7E)
@@ -159,7 +165,9 @@ typedef struct {
 } CliCommandList_t;
 
 /* ===== CLI Public Functions ===== */
+int cli_vprintf( const char *fmt, va_list ap );
 int cli_printf( const char *fmt, ... );
+int cli_printf_msg( const char *fmt, ... );
 CliType_t cli_addList( CliCommand_t *list, int count );
 void cli_setCtrlCOp( CliCtrlCFn_t ctrlC, void *args );
 CliType_t cli_init( void );

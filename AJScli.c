@@ -27,6 +27,9 @@ static char commandHistory[CLI_MAX_COMMAND_HISTORY + 1][CLI_MAX_COMMAND_LENGTH];
 static char currentCommand[CLI_MAX_COMMAND_LENGTH];
 static char printfBuf[CLI_PRINTF_BUF];
 
+static int currentCommandLength = 0;
+static int currentCursorPosition = 0;
+
 static CliGetCharFn_t getCharFn = NULL;
 static CliPutCharFn_t putCharFn = NULL;
 static CliCtrlCFn_t ctrlCFn = NULL;
@@ -37,6 +40,9 @@ static CliCommandList_t commandLists[CLI_MAX_COMMAND_LISTS];
 static CliType_t prvCommandHelp(int argc, char *argv[]);
 static CliType_t prvCommandHistory(int argc, char *argv[]);
 static CliType_t prvClearScreen(int argc, char *argv[]);
+#ifdef NVIC_SystemReset
+static CliType_t prvResetSystem(int argc, char *argv[]);
+#endif
 
 static CliCommand_t defaultCommands[] = {
     {   .command    = "help",
@@ -55,6 +61,14 @@ static CliCommand_t defaultCommands[] = {
         .help       = "Clear screen",
         .fn         = &prvClearScreen,
     },
+#ifdef NVIC_SystemReset
+    {
+        .command    = "reset",
+        .usage      = "",
+        .help       = "Reset Microcontroller",
+        .fn         = &prvResetSystem,
+    },
+#endif
 };
 
 static int historyCommand;
@@ -160,6 +174,18 @@ static CliType_t prvClearScreen( int argc, char *argv[] )
     return CLI_OK;
 }
 
+// Reset Microcontroller
+#ifdef NVIC_SystemReset
+static CliType_t prvResetSystem( int argc, char *argv[] )
+{
+    prvClearScreen( argc, argv );
+#if INCLUDE_vTaskDelay
+    vTaskDelay( pdMS_TO_TICKS(50) );
+#endif
+    NVIC_SystemReset();
+}
+#endif // NVIC_SystemReset
+
 // Default command to print history of CLI
 static CliType_t prvCommandHistory( int argc, char *argv[] )
 {
@@ -182,7 +208,7 @@ static void prvCallCommand( char *command )
 {
     // Terminate, if necessary
     int i = strnlen(command, CLI_MAX_COMMAND_LENGTH - 1);
-    command[i] = CLI_CHAR_NULL; 
+    command[i] = CLI_CHAR_NULL;
 
     // Remove any trailing spaces
     while ( command[--i] == CLI_CHAR_SPACE ) {
@@ -225,20 +251,58 @@ static void prvCallCommand( char *command )
     }
 }
 
+// Quick macro for left arrow key press
+#define _CLI_CURSOR_LEFT()  cli_printf( "%c%c%c", CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT )
+
 /* ===== Public Functions ===== */
-int cli_printf( const char *fmt, ... )
-{
-    va_list ap;
-    va_start( ap, fmt );
+int cli_vprintf( const char *fmt, va_list ap ) {
     int r = vsnprintf( printfBuf, CLI_PRINTF_BUF, fmt, ap );
-    va_end(ap);
-    printfBuf[ CLI_PRINTF_BUF - 1 ] = CLI_CHAR_NULL;
+    printfBuf[CLI_PRINTF_BUF - 1] = CLI_CHAR_NULL;
 
     int i = 0;
     while ( printfBuf[i] != CLI_CHAR_NULL ) {
         prvPutChar( printfBuf[i++] );
     }
 
+    return r;
+}
+
+int cli_printf( const char *fmt, ... )
+{
+    va_list ap;
+    va_start( ap, fmt );
+    int r = cli_vprintf( fmt, ap );
+    va_end(ap);
+    return r;
+}
+
+int cli_printf_msg( const char *fmt, ... )
+{
+    int r = cli_printf( "%c%c%c%c", CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, 'M', CLI_CHAR_RETURN );
+#if CLI_HAS_COLOR_PRINT
+    r += cli_printf( "\033[0;32m" );
+#endif
+
+    va_list ap;
+    va_start( ap, fmt );
+    r += cli_vprintf( fmt, ap );
+    va_end(ap);
+
+#if CLI_HAS_COLOR_PRINT
+    r += cli_printf( "\033[0;37m" );
+#endif
+    r += cli_printf( "%s%s ", CLI_NEWLINE, CLI_PROMPT );
+
+    int i;
+    for ( i = 0; i < currentCommandLength; i++ ) {
+        prvPutChar( currentCommand[i] );
+        ++r;
+    }
+    i -= currentCursorPosition;
+
+    while ( i-- ) {
+        r += _CLI_CURSOR_LEFT();
+    }
     return r;
 }
 
@@ -307,9 +371,6 @@ CliType_t cli_init( void )
     return err;
 }
 
-// Quick macro for left arrow key press
-#define _CLI_CURSOR_LEFT()  cli_printf( "%c%c%c", CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT )
-
 // Blocking task to process input. Should not return.
 void cli_task( void *params )
 {
@@ -319,10 +380,11 @@ void cli_task( void *params )
     (void) params;
 #endif
 
+    // We may need an optional initalization function to wait.
+    CLI_INIT( getCharFn, putCharFn );
+
     // Set all task variables to default states
     cli_printf( "%s ", CLI_PROMPT );
-    int currentCommandLength = 0;
-    int currentCursorPosition = 0;
     historyCommand = 0;
     currentCommandIdx = 0;
     memset( commandHistory, 0, sizeof(commandHistory) );
@@ -535,5 +597,3 @@ void cli_task( void *params )
     vTaskDelete( NULL );
 #endif
 }
-
-#undef _CLI_CURSOR_LEFT

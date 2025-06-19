@@ -280,7 +280,7 @@ int cli_printf_msg( const char *fmt, ... )
 {
     int r = cli_printf( "%c%c%c%c", CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, 'M', CLI_CHAR_RETURN );
 #if CLI_HAS_COLOR_PRINT
-    r += cli_printf( "\033[0;32m" );
+    r += cli_printf( CLI_COLOR_GREEN );
 #endif
 
     va_list ap;
@@ -289,7 +289,7 @@ int cli_printf_msg( const char *fmt, ... )
     va_end(ap);
 
 #if CLI_HAS_COLOR_PRINT
-    r += cli_printf( "\033[0;37m" );
+    r += cli_printf( CLI_COLOR_DEFAULT );
 #endif
     r += cli_printf( "%s%s ", CLI_NEWLINE, CLI_PROMPT );
 
@@ -584,9 +584,9 @@ void cli_task( void *params )
 
         // If in insert mode, display cursor properly
         if ( flags.insertMode ) {
-            cli_printf( "\033[7m%c%c%c%c\033[0;37m",
+            cli_printf( "\033[7m%c%c%c%c%s",
                 (currentCursorPosition == currentCommandLength)? CLI_CHAR_SPACE : currentCommand[currentCursorPosition],
-                CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT );
+                CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT, CLI_COLOR_DEFAULT );
         }
 
 #endif /* CLI_ONLY_SHOW_ASCII */

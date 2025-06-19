@@ -16,6 +16,10 @@
 #ifndef AJS_CLI_H
 #define AJS_CLI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ===== Custom Configuration Parameters ===== */
 #ifndef AJS_CLI_CFG_H
     #ifdef __has_include
@@ -69,17 +73,22 @@ typedef long CliType_t;
 #define CLI_TRUE                    (1)
 #define CLI_FALSE                   (0)
 
-/* ===== Required CLI Parameters ===== */
-#ifndef CLI_PROMPT
-#define CLI_PROMPT                  ("\033[0;37m>")
-#endif
+/* ===== CLI Text Colors ===== */
+#define CLI_COLOR_RED               "\033[0;31m"
+#define CLI_COLOR_GREEN             "\033[0;32m"
+#define CLI_COLOR_YELLOW            "\033[0;33m"
+#define CLI_COLOR_BLUE              "\033[0;34m"
+#define CLI_COLOR_MAGENTA           "\033[0;35m"
+#define CLI_COLOR_CYAN              "\033[0;36m"
+#define CLI_COLOR_WHITE             "\033[0;37m"
 
+/* ===== Required CLI Parameters ===== */
 #ifndef CLI_NEWLINE
-#define CLI_NEWLINE                 ("\r\n")
+#define CLI_NEWLINE                 "\r\n"
 #endif
 
 #ifndef CLI_INIT_TEXT
-#define CLI_INIT_TEXT               ("")
+#define CLI_INIT_TEXT               ""
 #endif
 
 #ifndef CLI_MAX_COMMAND_LENGTH
@@ -110,6 +119,14 @@ typedef long CliType_t;
 #define CLI_HAS_INSERT_MODE         (1)
 #endif
 
+#ifndef CLI_COLOR_DEFAULT
+#define CLI_COLOR_DEFAULT           CLI_COLOR_WHITE
+#endif
+
+#ifndef CLI_PROMPT
+#define CLI_PROMPT                  CLI_COLOR_WHITE ">"
+#endif
+
 /* ===== CLI Constants ===== */
 #define CLI_CHAR_PRINT_MIN          (0x20)
 #define CLI_CHAR_PRINT_MAX          (0x7E)
@@ -128,7 +145,7 @@ typedef long CliType_t;
 #define CLI_CHAR_ARROW_LEFT         ('D')
 #define CLI_CHAR_INSERT             ('O')
 #define CLI_CHAR_DELETE             ('P')
-#define CLI_STRING_CLEAR            ("\033[1;1H\033[2J")
+#define CLI_STRING_CLEAR            "\033[1;1H\033[2J"
 
 #if CLI_GET_CH
     #define CLI_CHAR_ESCAPE_READ        (0xE0)
@@ -192,11 +209,11 @@ CliType_t cli_setOps( CliGetCharFn_t getChar, CliPutCharFn_t putChar );
 #endif
 
 #if CLI_HAS_COLOR_PRINT
-    #define cli_printf_err(...)             \
-        do {                                \
-            cli_printf( "\033[0;31m" );     \
-            cli_printf( __VA_ARGS__ );      \
-            cli_printf( "\033[0;37m" );     \
+    #define cli_printf_err(...)                 \
+        do {                                    \
+            cli_printf( CLI_COLOR_RED );        \
+            cli_printf( __VA_ARGS__ );          \
+            cli_printf( CLI_COLOR_DEFAULT );    \
         } while ( 0 )
 #else
     #define cli_printf_err      cli_printf
@@ -207,5 +224,9 @@ CliType_t cli_setOps( CliGetCharFn_t getChar, CliPutCharFn_t putChar );
         cli_setOps( NULL, NULL );       \
         cli_setCtrlCOp( NULL );         \
     } while (0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* AJS_CLI_H */

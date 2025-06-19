@@ -4,8 +4,8 @@
 #ifndef AJS_CLI_CFG_H
 #define AJS_CLI_CFG_H
 
-#define CLI_PROMPT                  (">")
-#define CLI_NEWLINE                 ("\r\n")
+#define CLI_PROMPT                  ">"
+#define CLI_NEWLINE                 "\r\n"
 #define CLI_MAX_COMMAND_LENGTH      (256)
 #define CLI_MAX_COMMAND_HISTORY     (32)
 #define CLI_MAX_COMMAND_ARGS        (10)
@@ -13,13 +13,14 @@
 #define CLI_SHOW_ONLY_ASCII         (0)
 #define CLI_HAS_COLOR_PRINT         (1)
 #define CLI_HAS_INSERT_MODE         (1)
-#define CLI_INIT_TEXT               ("")
+#define CLI_INIT_TEXT               ""
 
 // Define if override necessary
 // #define CLI_SET_OPS    0
 // #define CLI_GET_CH     1
 // #define CLI_RTOS_TASK_DELETE     0
 // #define CLI_ESC_HAS_PREFIX       0
+// #define CLI_COLOR_DEFAULT
 
 // Define if initialization functions are necessary
 // #define CLI_INIT(get, put)              \

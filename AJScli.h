@@ -124,7 +124,7 @@ typedef long CliType_t;
 #endif
 
 #ifndef CLI_PROMPT
-#define CLI_PROMPT                  CLI_COLOR_WHITE ">"
+#define CLI_PROMPT                  CLI_COLOR_DEFAULT ">"
 #endif
 
 /* ===== CLI Constants ===== */

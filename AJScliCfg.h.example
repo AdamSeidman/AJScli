@@ -1,8 +1,8 @@
 // Includes to change AJScli defaults
 // Example:
 
-#ifndef AJS_CLI_CFG_H__
-#define AJS_CLI_CFG_H__
+#ifndef AJS_CLI_CFG_H
+#define AJS_CLI_CFG_H
 
 #define CLI_PROMPT                  (">")
 #define CLI_NEWLINE                 ("\r\n")
@@ -13,11 +13,12 @@
 #define CLI_SHOW_ONLY_ASCII         (0)
 #define CLI_HAS_COLOR_PRINT         (1)
 #define CLI_HAS_INSERT_MODE         (1)
+#define CLI_INIT_TEXT               ("")
 
 // Define if override necessary
-// #define _CLI_SET_OPS    0
-// #define _CLI_GET_CH     1
-// #define _CLI_RTOS_TASK_DELETE    0
+// #define CLI_SET_OPS    0
+// #define CLI_GET_CH     1
+// #define CLI_RTOS_TASK_DELETE     0
 // #define CLI_ESC_HAS_PREFIX       0
 
 // Define if initialization functions are necessary
@@ -27,4 +28,4 @@
 //         (void) put;                     \
 //     } while (0)
 
-#endif /* AJS_CLI_CFG_H__ */
+#endif /* AJS_CLI_CFG_H */

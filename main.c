@@ -1,6 +1,5 @@
 #include <stdlib.h>
 
-// #include "AJScliCfg.h" // Include if overriding defaults
 #include "AJScli.h"
 
 #ifndef ARRAYSIZE

@@ -252,7 +252,7 @@ static void prvCallCommand( char *command )
 }
 
 // Quick macro for left arrow key press
-#define _CLI_CURSOR_LEFT()  cli_printf( "%c%c%c", CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT )
+#define CLI_CURSOR_LEFT()   cli_printf( "%c%c%c", CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT )
 
 /* ===== Public Functions ===== */
 int cli_vprintf( const char *fmt, va_list ap ) {
@@ -301,7 +301,7 @@ int cli_printf_msg( const char *fmt, ... )
     i -= currentCursorPosition;
 
     while ( i-- ) {
-        r += _CLI_CURSOR_LEFT();
+        r += CLI_CURSOR_LEFT();
     }
     return r;
 }
@@ -330,7 +330,7 @@ void cli_setCtrlCOp( CliCtrlCFn_t ctrlC, void *args )
     ctrlCArgs = args;
 }
 
-#if _CLI_SET_OPS
+#if CLI_SET_OPS
 // Set getChar and putChar functions for CLI
 CliType_t cli_setOps( CliGetCharFn_t getChar, CliPutCharFn_t putChar )
 {
@@ -359,7 +359,7 @@ CliType_t cli_init( void )
 {
     getCharFn = &prvWinGetChar;
     putCharFn = &prvWinPutChar;
-#endif /* _CLI_SET_OPS */
+#endif /* CLI_SET_OPS */
 
     flags.insertMode = 0;
     flags.screenCleared = 0;
@@ -384,7 +384,7 @@ void cli_task( void *params )
     CLI_INIT( getCharFn, putCharFn );
 
     // Set all task variables to default states
-    cli_printf( "%s ", CLI_PROMPT );
+    cli_printf( "%s%s ", CLI_INIT_TEXT, CLI_PROMPT );
     historyCommand = 0;
     currentCommandIdx = 0;
     memset( commandHistory, 0, sizeof(commandHistory) );
@@ -422,7 +422,7 @@ void cli_task( void *params )
                 ++currentCursorPosition;
                 // Move cursor back
                 while ( i-- > currentCursorPosition ) {
-                    _CLI_CURSOR_LEFT();
+                    CLI_CURSOR_LEFT();
                 }
             }
             else {
@@ -469,7 +469,7 @@ void cli_task( void *params )
         /* Backspace */
         else if ( c == CLI_CHAR_BACKSPACE && currentCommandLength > 0 && currentCursorPosition > 0 ) {
             // Cursor left
-            _CLI_CURSOR_LEFT();
+            CLI_CURSOR_LEFT();
             if ( currentCursorPosition < currentCommandLength ) {
                 // We are not at the end of the word
                 i = currentCursorPosition;
@@ -481,7 +481,7 @@ void cli_task( void *params )
                 currentCommand[ currentCommandLength - 1 ] = 0;
                 for ( i = 0; i <= currentCommandLength - currentCursorPosition; i++ ) {
                     // Move back to where we were
-                    _CLI_CURSOR_LEFT();
+                    CLI_CURSOR_LEFT();
                 }
                 --currentCommandLength;
             }
@@ -490,7 +490,7 @@ void cli_task( void *params )
                 // Erase Character
                 prvPutChar( CLI_CHAR_SPACE );
                 // Cursor left
-                _CLI_CURSOR_LEFT();
+                CLI_CURSOR_LEFT();
                 currentCommand[ currentCommandLength-- ] = 0;
             }
             --currentCursorPosition;
@@ -514,7 +514,7 @@ void cli_task( void *params )
                 prvPutChar( CLI_CHAR_SPACE );
                 for ( i = 1; i <= currentCommandLength - currentCursorPosition; i++ ) {
                     // Move back to where we were
-                    _CLI_CURSOR_LEFT();
+                    CLI_CURSOR_LEFT();
                 }
                 memmove( currentCommand + currentCursorPosition, currentCommand + currentCursorPosition + 1, (currentCommandLength - currentCursorPosition) + 1 );
                 currentCommand[ --currentCommandLength ] = 0;
@@ -526,7 +526,7 @@ void cli_task( void *params )
                 if ( !flags.insertMode ) {
                     // If leaving mode, clean up next character
                     prvPutChar( (currentCursorPosition == currentCommandLength)? CLI_CHAR_SPACE : currentCommand[ currentCursorPosition ] );
-                    _CLI_CURSOR_LEFT();
+                    CLI_CURSOR_LEFT();
                 }
 #else
                 // We are ignoring this input
@@ -569,10 +569,10 @@ void cli_task( void *params )
             else if ( c == CLI_CHAR_ARROW_LEFT_READ && currentCursorPosition != 0 ) {
                 if ( flags.insertMode ) {
                     prvPutChar( (currentCursorPosition == currentCommandLength)? CLI_CHAR_SPACE : currentCommand[currentCursorPosition] );
-                    _CLI_CURSOR_LEFT();
+                    CLI_CURSOR_LEFT();
                 }
                 --currentCursorPosition;
-                _CLI_CURSOR_LEFT();
+                CLI_CURSOR_LEFT();
             }
         }
         /* Unkown Input */
@@ -592,7 +592,7 @@ void cli_task( void *params )
 #endif /* CLI_ONLY_SHOW_ASCII */
     }
 
-#if _CLI_RTOS_TASK_DELETE
+#if CLI_RTOS_TASK_DELETE
     // In case of other error, prevent FreeRTOS configASSERT
     vTaskDelete( NULL );
 #endif

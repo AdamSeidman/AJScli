@@ -13,31 +13,45 @@
 
 *******************************************************************/
 
-#ifndef AJS_CLI_H__
-#define AJS_CLI_H__
+#ifndef AJS_CLI_H
+#define AJS_CLI_H
 
-#include "AJScliCfg.h"
+/* ===== Custom Configuration Parameters ===== */
+#ifndef AJS_CLI_CFG_H
+    #ifdef __has_include
+        #if __has_include("AJScliCfg.h")
+            #include "AJScliCfg.h"
+        #endif
+    #elif defined(_INC_AJS_CLI_CFG)
+        #include "AJScliCfg.h"
+    #endif
+#endif // AJS_CLI_CFG_H
+
 
 /* ===== Override Macros ===== */
-#ifndef _CLI_SET_OPS
+#ifndef CLI_SET_OPS
     #ifdef _WIN32
-        #define _CLI_SET_OPS    0
-        #define _CLI_GET_CH     1
+        #define CLI_SET_OPS    0
+        #define CLI_GET_CH     1
     #else
-        #define _CLI_SET_OPS    1
-        #define _CLI_GET_CH     0
+        #define CLI_SET_OPS    1
+        #define CLI_GET_CH     0
     #endif // _WIN32
-#elif !defined(_CLI_GET_CH)
-    #define _CLI_GET_CH     0
-#endif // _CLI_SET_OPS
+#elif !defined(CLI_GET_CH)
+    #define CLI_GET_CH     0
+#endif // CLI_SET_OPS
 
-#ifndef _CLI_RTOS_TASK_DELETE
+#ifndef CLI_RTOS_TASK_DELETE
     #ifdef INC_FREERTOS_H
-        #define _CLI_RTOS_TASK_DELETE   1
+        #define CLI_RTOS_TASK_DELETE   1
     #else
-        #define _CLI_RTOS_TASK_DELETE   0
+        #define CLI_RTOS_TASK_DELETE   0
     #endif // INC_FREERTOS_H
-#endif // _CLI_RTOS_TASK_DELETE
+#endif // CLI_RTOS_TASK_DELETE
+
+#ifndef CLI_INIT
+    #define CLI_INIT(x, y)
+#endif // CLI_INIT
 
 /* ===== CLI Types ===== */
 typedef long CliType_t;
@@ -62,6 +76,10 @@ typedef long CliType_t;
 
 #ifndef CLI_NEWLINE
 #define CLI_NEWLINE                 ("\r\n")
+#endif
+
+#ifndef CLI_INIT_TEXT
+#define CLI_INIT_TEXT               ("")
 #endif
 
 #ifndef CLI_MAX_COMMAND_LENGTH
@@ -92,10 +110,6 @@ typedef long CliType_t;
 #define CLI_HAS_INSERT_MODE         (1)
 #endif
 
-#ifndef CLI_INIT
-#define CLI_INIT(get, put)
-#endif
-
 /* ===== CLI Constants ===== */
 #define CLI_CHAR_PRINT_MIN          (0x20)
 #define CLI_CHAR_PRINT_MAX          (0x7E)
@@ -116,7 +130,7 @@ typedef long CliType_t;
 #define CLI_CHAR_DELETE             ('P')
 #define CLI_STRING_CLEAR            ("\033[1;1H\033[2J")
 
-#if _CLI_GET_CH
+#if CLI_GET_CH
     #define CLI_CHAR_ESCAPE_READ        (0xE0)
     #define CLI_CHAR_ARROW_UP_READ      ('H')
     #define CLI_CHAR_ARROW_DOWN_READ    ('P')
@@ -138,7 +152,7 @@ typedef long CliType_t;
     #ifndef CLI_ESC_HAS_PREFIX
         #define CLI_ESC_HAS_PREFIX      (1)
     #endif
-#endif // _CLI_GET_CH
+#endif // CLI_GET_CH
 
 #define CLI_PRINTF_BUF                  (CLI_MAX_COMMAND_LENGTH)
 
@@ -173,7 +187,7 @@ void cli_setCtrlCOp( CliCtrlCFn_t ctrlC, void *args );
 CliType_t cli_init( void );
 void cli_task( void *params );
 
-#if _CLI_SET_OPS
+#if CLI_SET_OPS
 CliType_t cli_setOps( CliGetCharFn_t getChar, CliPutCharFn_t putChar );
 #endif
 
@@ -194,4 +208,4 @@ CliType_t cli_setOps( CliGetCharFn_t getChar, CliPutCharFn_t putChar );
         cli_setCtrlCOp( NULL );         \
     } while (0)
 
-#endif /* AJS_CLI_H__ */
+#endif /* AJS_CLI_H */

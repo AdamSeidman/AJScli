@@ -66,6 +66,9 @@ typedef long CliType_t;
 #define CLI_ERRNO_NOMEM             3
 #define CLI_ERRNO_NULL_PTR          4
 #define CLI_ERRNO_BAD_FMT           5
+#define CLI_ERRNO_NO_RESPONSE       6
+#define CLI_ERRNO_FAULT             7
+#define CLI_ERRNO_OUT_OF_RANGE      8
 
 #define CLI_OK                      (CLI_ERRNO_NONE)
 #define CLI_ERR                     (-1)

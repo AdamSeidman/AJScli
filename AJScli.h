@@ -222,12 +222,6 @@ CliType_t cli_setOps( CliGetCharFn_t getChar, CliPutCharFn_t putChar );
     #define cli_printf_err      cli_printf
 #endif
 
-#define cli_delete()                    \
-    do {                                \
-        cli_setOps( NULL, NULL );       \
-        cli_setCtrlCOp( NULL );         \
-    } while (0)
-
 #ifdef __cplusplus
 }
 #endif

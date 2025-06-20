@@ -359,7 +359,7 @@ CliType_t cli_init( void )
 {
     getCharFn = &prvWinGetChar;
     putCharFn = &prvWinPutChar;
-#endif /* CLI_SET_OPS */
+#endif // CLI_SET_OPS
 
     flags.insertMode = 0;
     flags.screenCleared = 0;
@@ -589,7 +589,7 @@ void cli_task( void *params )
                 CLI_CHAR_ESCAPE, CLI_CHAR_ESC_PREFIX, CLI_CHAR_ARROW_LEFT, CLI_COLOR_DEFAULT );
         }
 
-#endif /* CLI_ONLY_SHOW_ASCII */
+#endif // CLI_ONLY_SHOW_ASCII
     }
 
 #if CLI_RTOS_TASK_DELETE

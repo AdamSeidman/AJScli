@@ -26,7 +26,7 @@ extern "C" {
         #if __has_include("AJScliCfg.h")
             #include "AJScliCfg.h"
         #endif
-    #elif defined(_INC_AJS_CLI_CFG)
+    #elif defined(INC_AJS_CLI_CFG)
         #include "AJScliCfg.h"
     #endif
 #endif // AJS_CLI_CFG_H

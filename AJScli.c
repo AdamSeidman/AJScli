@@ -65,7 +65,7 @@ static CliCommand_t defaultCommands[] = {
     {
         .command    = "reset",
         .usage      = "",
-        .help       = "Reset Microcontroller",
+        .help       = "Reset microcontroller",
         .fn         = &prvResetSystem,
     },
 #endif
